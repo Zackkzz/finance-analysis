@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from finance-analysis!")
+"""Market brief financial analysis backend."""

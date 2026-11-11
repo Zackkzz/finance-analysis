@@ -1,13 +1,16 @@
-import yfinance as yf
-import pandas as pd
+"""Print raw Yahoo Finance information and one news item for exploration."""
+
 import json
 
-def main():
-	dat = yf.Ticker("WTC.AX")
-	print(json.dumps(dat.info, indent=4))
+import yfinance as yf
 
-	print(json.dumps(dat.get_news(), indent=4))
-	exit()
+
+def main() -> None:
+    dat = yf.Ticker("WTC.AX")
+    print(json.dumps(dat.info, indent=4))
+
+    print(json.dumps(dat.get_news(count=1), indent=4))
+
 
 if __name__ == "__main__":
-	main()
+    main()

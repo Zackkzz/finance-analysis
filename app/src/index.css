@@ -1,111 +1,82 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+@font-face {
+  font-family: "Barlow Semi Condensed";
+  src: url("./assets/barlow-semi-condensed-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@theme {
+  --font-sans: "Avenir Next", "Segoe UI", sans-serif;
+  --font-heading: "Barlow Semi Condensed", "Avenir Next", "Segoe UI", sans-serif;
+  --text-label: 0.81rem;
+  --radius-panel: 14px;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  --color-ink: #162735;
+  --color-muted: #4d6170;
+  --color-canvas: #edf2f5;
+  --color-paper: #f8fafb;
+  --color-rule: #cdd9e0;
+  --color-ticker: #e1e9ee;
+  --color-navy: #112c3d;
+  --color-on-navy: #f2f8fb;
+  --color-on-navy-muted: #aec3ce;
+  --color-trace: #89e0da;
+  --color-focus: #176c74;
+  --color-gain: #176452;
+  --color-loss: #973f40;
+  --color-range-track: #1b3a4d;
+  --color-range-hover: #315568;
+  --color-retry-hover: #b3ece8;
+  --color-plot-grid: #345265;
+  --color-plot-area: #1d4655;
+  --color-plot-cursor: #84a7b7;
+}
+
+@custom-variant compact (@media (width <= 900px));
+@custom-variant handset (@media (width <= 570px));
+@custom-variant narrow (@media (width <= 380px));
+
+@layer base {
+  html {
+    @apply bg-canvas text-ink antialiased;
+    line-height: normal;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply min-w-80;
+  }
+
+  h1, h2 {
+    @apply font-heading font-bold;
+  }
+
+  h2 {
+    @apply text-[1.4rem]/[1.2];
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring, var(--color-focus));
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    @apply bg-trace text-navy;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+@utility page-width {
+  @apply mx-auto w-[min(1160px,calc(100%-80px))] compact:w-[calc(100%-48px)] handset:w-[calc(100%-32px)];
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+@utility stock-grid {
+  @apply grid grid-cols-[minmax(0,2.4fr)_minmax(275px,1fr)] gap-4 compact:grid-cols-1;
 }
 
-body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+@utility chart-panel {
+  @apply min-w-0 rounded-panel bg-navy px-[27px] pt-[25px] pb-5 text-on-navy handset:p-[17px];
+  --focus-ring: var(--color-trace);
 }

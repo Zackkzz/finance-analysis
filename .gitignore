@@ -7,4 +7,39 @@ wheels/
 *.egg-info
 
 # Virtual environments
-.venv
+.venv/
+
+# Python tooling caches and coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Frontend dependencies and generated files
+node_modules/
+dist-ssr/
+*.tsbuildinfo
+coverage/
+
+# Rust build output
+target/
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+!.env.template
+*.local
+
+# Logs
+logs/
+*.log
+
+# Local design tooling output
+/.impeccable/hook.cache.json
+/.impeccable/review/
+
+# macOS metadata
+.DS_Store

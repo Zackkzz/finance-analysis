@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-10T06:17:21.674743+00:00",
+  "title": "Design System: Market brief",
+  "extensions": {
+    "colorMeta": {
+      "trace": {
+        "role": "primary",
+        "displayName": "Aqua trace"
+      },
+      "focus": {
+        "role": "neutral",
+        "displayName": "Focus"
+      },
+      "gain": {
+        "role": "secondary",
+        "displayName": "Daily gain"
+      },
+      "loss": {
+        "role": "secondary",
+        "displayName": "Daily loss"
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Daylight canvas"
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Ledger paper"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted"
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule"
+      },
+      "ticker": {
+        "role": "neutral",
+        "displayName": "Ticker"
+      },
+      "navy": {
+        "role": "neutral",
+        "displayName": "Display navy"
+      },
+      "on-navy": {
+        "role": "neutral",
+        "displayName": "On navy"
+      },
+      "on-navy-muted": {
+        "role": "neutral",
+        "displayName": "On navy muted"
+      },
+      "range-track": {
+        "role": "neutral",
+        "displayName": "Range track"
+      },
+      "range-hover": {
+        "role": "neutral",
+        "displayName": "Range hover"
+      },
+      "retry-hover": {
+        "role": "neutral",
+        "displayName": "Retry hover"
+      },
+      "plot-grid": {
+        "role": "neutral",
+        "displayName": "Plot grid"
+      },
+      "plot-area": {
+        "role": "neutral",
+        "displayName": "Plot area"
+      },
+      "plot-cursor": {
+        "role": "neutral",
+        "displayName": "Plot cursor"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Company heading",
+        "purpose": "Name the listed company."
+      },
+      "quote": {
+        "displayName": "Daily quote",
+        "purpose": "Show the latest daily price."
+      }
+    },
+    "shadows": [],
+    "motion": [],
+    "breakpoints": [
+      {
+        "name": "stack-dashboard",
+        "value": "900px"
+      },
+      {
+        "name": "stack-quote",
+        "value": "570px"
+      },
+      {
+        "name": "stack-ledger",
+        "value": "380px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Range option",
+      "kind": "button",
+      "refersTo": "range-button",
+      "description": "Select the visible price history window.",
+      "html": "<div class=\"ds-range\"><button class=\"ds-button\" aria-pressed=\"false\">1M</button><button class=\"ds-button\" aria-pressed=\"true\">6M</button></div>",
+      "css": ".ds-button { min-height: 36px; padding-inline: 11px; border: 0; border-radius: 4px; font: 700 0.81rem 'Avenir Next', 'Segoe UI', sans-serif; cursor: pointer; }\n.ds-button:focus-visible { outline: 2px solid var(--trace, #89e0da); outline-offset: 3px; }\n\n.ds-range { display: inline-flex; gap: 3px; padding: 3px; border-radius: 6px; background: #1b3a4d; }\n.ds-range .ds-button { background: transparent; color: var(--on-navy, #f2f8fb); }\n.ds-range .ds-button:hover { background: #315568; }\n.ds-range .ds-button[aria-pressed=\"true\"] { color: var(--navy, #112c3d); background: var(--trace, #89e0da); }"
+    },
+    {
+      "name": "Retry",
+      "kind": "button",
+      "refersTo": "retry",
+      "description": "Retry a failed data load.",
+      "html": "<button class=\"ds-button ds-retry\">Try again</button>",
+      "css": ".ds-button { min-height: 36px; padding-inline: 11px; border: 0; border-radius: 4px; font: 700 0.81rem 'Avenir Next', 'Segoe UI', sans-serif; cursor: pointer; }\n.ds-button:focus-visible { outline: 2px solid var(--trace, #89e0da); outline-offset: 3px; }\n\n.ds-retry { color: var(--navy, #112c3d); background: var(--trace, #89e0da); }\n.ds-retry:hover { background: #b3ece8; }\n.ds-retry:focus-visible { outline-color: var(--focus, #176c74); }"
+    },
+    {
+      "name": "Ticker badge",
+      "kind": "chip",
+      "refersTo": "ticker",
+      "description": "Identify the listed security.",
+      "html": "<span class=\"ds-ticker\">WTC.AX</span>",
+      "css": ".ds-ticker { color: var(--ink, #162735); background: #e1e9ee; font: 730 0.85rem \"Avenir Next\", \"Segoe UI\", sans-serif; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.025em; }"
+    },
+    {
+      "name": "Market snapshot",
+      "kind": "card",
+      "refersTo": "market-ledger",
+      "description": "Scan current market figures beside the chart.",
+      "html": "<section class=\"ds-ledger\"><h2>Market snapshot</h2><dl><div><dt>Market cap</dt><dd>Unavailable</dd></div><div><dt>52-week range</dt><dd>Unavailable</dd></div></dl></section>",
+      "css": ".ds-ledger { padding: 24px; background: var(--paper, #f8fafb); color: var(--ink, #162735); border: 1px solid var(--rule, #cdd9e0); border-radius: 14px; font-family: 'Avenir Next', 'Segoe UI', sans-serif; }\n.ds-ledger h2 { margin: 0; font: 700 1.4rem/1.2 var(--heading-font, sans-serif); }\n.ds-ledger dl { margin: 20px 0 0; border-top: 1px solid var(--rule, #cdd9e0); }\n.ds-ledger dl div { display: flex; justify-content: space-between; gap: 10px; padding-block: 16px; border-bottom: 1px solid var(--rule, #cdd9e0); }\n.ds-ledger dt, .ds-ledger dd { color: var(--muted, #4d6170); font-size: 0.81rem; margin: 0; }"
+    },
+    {
+      "name": "Chart field",
+      "kind": "custom",
+      "refersTo": "price-chart",
+      "description": "Use the dark plot surface for price history and its states.",
+      "html": "<section class=\"ds-chart\"><h2>Price history</h2><p>Daily prices · AUD</p><div class=\"ds-chart-state\">Loading daily prices…</div></section>",
+      "css": ".ds-chart { padding: 25px 27px 20px; border-radius: 14px; background: var(--navy, #112c3d); color: var(--on-navy, #f2f8fb); font-family: 'Avenir Next', 'Segoe UI', sans-serif; }\n.ds-chart h2 { margin: 0; font: 700 1.4rem/1.2 var(--heading-font, sans-serif); }\n.ds-chart p { margin: 4px 0 0; font-size: 0.81rem; color: var(--on-navy-muted, #aec3ce); }\n.ds-chart-state { min-height: 165px; display: grid; place-items: center; color: var(--on-navy-muted, #aec3ce); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Railway Timetable",
+    "overview": "The dark chart reads like a station display. A cool daylight frame surrounds it, and a compact ledger makes the accompanying figures easy to scan.",
+    "keyCharacteristics": [
+      "Condensed headings establish hierarchy.",
+      "Tabular readings sit in fixed positions.",
+      "Hairlines separate measurements and groups."
+    ],
+    "rules": [
+      {
+        "name": "The Fixed Reading Rule",
+        "body": "Use tabular numerals for quotes, axis labels, selected dates and metric values. Keep the trading date and currency next to the corresponding reading.",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "Do keep the chart trace, selection marker and active range in the same aqua.",
+      "Do label dates and currencies at the point of reading."
+    ],
+    "donts": [
+      "Don't add shadows to the data panels.",
+      "Don't communicate price direction by color alone."
+    ]
+  }
+}
