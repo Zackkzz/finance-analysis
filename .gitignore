@@ -23,9 +23,6 @@ dist-ssr/
 *.tsbuildinfo
 coverage/
 
-# Rust build output
-target/
-
 # Local environment configuration
 .env
 .env.*
