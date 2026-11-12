@@ -47,7 +47,7 @@
   }
 
   body {
-    @apply min-w-80;
+    @apply min-w-0;
   }
 
   h1, h2 {

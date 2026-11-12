@@ -2,6 +2,8 @@ import { decimal, formatDate, signed } from './format'
 import { PriceChart } from './components/PriceChart'
 import type { StockSnapshot } from './types'
 import { useStock } from './useStock'
+import { StockNews } from './news/StockNews'
+import { STOCK_SYMBOL } from './api'
 
 const compact = new Intl.NumberFormat('en-AU', { notation: 'compact', maximumFractionDigits: 2 })
 const missing = 'Unavailable'
@@ -34,7 +36,7 @@ export function StockOverview() {
           <div>
             <h1 className="text-[3.5rem]/[1.06] tracking-[-0.02em] handset:text-[2.55rem]/[1.06]">WiseTech Global</h1>
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-[7px] text-[0.85rem] text-muted">
-              <span className="rounded-sm bg-ticker px-2 py-[3px] font-[730] tracking-[0.025em] text-ink">WTC.AX</span>
+              <span className="rounded-sm bg-ticker px-2 py-[3px] font-[730] tracking-[0.025em] text-ink">{STOCK_SYMBOL}</span>
               <span>Australian Securities Exchange</span>
             </div>
           </div>
@@ -48,7 +50,7 @@ export function StockOverview() {
                 <div className={statusPanel} role="status"><p>Loading daily prices…</p></div>
               ) : (
                 <div className={statusPanel}>
-                  <p className="max-w-[35ch]" role="alert">Yahoo Finance data is unavailable. Check that the local stock API is running and try again.</p>
+                  <p className="max-w-[35ch]" role="alert">{state.message}</p>
                   <button className="min-h-9 cursor-pointer rounded-sm bg-trace px-[11px] text-label font-bold text-navy hover:bg-retry-hover" type="button" onClick={retry}>Try again</button>
                 </div>
               )}
@@ -59,6 +61,7 @@ export function StockOverview() {
             </section>
           </div>
         )}
+        <StockNews symbol={STOCK_SYMBOL} />
         <footer className="flex flex-wrap justify-between gap-x-4 gap-y-1.5 pt-4 pb-7 text-[0.78rem] text-muted">
           <span>Source <a className="underline underline-offset-[0.2em] hover:text-focus" href="https://finance.yahoo.com/quote/WTC.AX/">Yahoo Finance</a></span>
           <span>Daily data may be delayed.</span>

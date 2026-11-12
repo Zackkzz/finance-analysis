@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
+import { fetchStock } from './api'
 import type { StockSnapshot } from './types'
 
-type StockState = { status: 'loading' } | { status: 'error' } | { status: 'ready'; stock: StockSnapshot }
+type StockState =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | { status: 'ready'; stock: StockSnapshot }
 
 export function useStock() {
   const [state, setState] = useState<StockState>({ status: 'loading' })
@@ -10,19 +14,21 @@ export function useStock() {
   useEffect(() => {
     const controller = new AbortController()
     const timeout = window.setTimeout(() => {
-      setState({ status: 'error' })
+      setState({ status: 'error', message: 'The stock request timed out. Please try again.' })
       controller.abort()
     }, 30_000)
 
     async function loadStock() {
       try {
-        const response = await fetch('/api/stock', { signal: controller.signal })
-        if (!response.ok) throw new Error('Could not load stock data')
-        const stock: StockSnapshot = await response.json()
-        if (stock.prices.length === 0) throw new Error('No price history')
+        const stock = await fetchStock(controller.signal)
         if (!controller.signal.aborted) setState({ status: 'ready', stock })
-      } catch {
-        if (!controller.signal.aborted) setState({ status: 'error' })
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setState({
+            status: 'error',
+            message: error instanceof Error ? error.message : 'Stock data could not be loaded. Please try again.',
+          })
+        }
       } finally {
         window.clearTimeout(timeout)
       }

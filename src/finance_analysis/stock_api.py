@@ -8,8 +8,9 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .stocks.models import ErrorResponse, StockSnapshot
-from .stocks.service import SYMBOL, get_stock
+from .stocks.service import get_stock
 
+SYMBOL = "WTC.AX"
 logger = logging.getLogger(__name__)
 app = FastAPI(title="Market brief API")
 
@@ -26,12 +27,13 @@ async def http_error_response(request: Request, exc: StarletteHTTPException) -> 
 
 
 @app.get("/api/stock", responses={502: {"model": ErrorResponse}})
-def read_stock(response: Response) -> StockSnapshot:
+def read_stock(response: Response, symbol: str = SYMBOL) -> StockSnapshot:
     response.headers["Cache-Control"] = "no-store"
+    response.headers["X-Data-Source"] = "yahoo"
     try:
-        return get_stock()
+        return get_stock(symbol)
     except Exception as exc:
-        logger.exception("Could not fetch %s", SYMBOL)
+        logger.exception("Could not fetch %s", symbol)
         raise HTTPException(
             status_code=502,
             detail="Yahoo Finance price data is unavailable. Try again shortly.",

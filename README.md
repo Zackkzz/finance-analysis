@@ -13,6 +13,14 @@ uv run finance-analysis
 
 For automatic backend reloads during development, run `uv run uvicorn finance_analysis.stock_api:app --reload`.
 
+To serve live stock data and news together, run the route app.
+
+```sh
+uv run uvicorn finance_analysis.route.main:app --reload
+```
+
+Both apps serve Yahoo Finance stock data at `/api/stock?symbol=WTC.AX`. The route app also exposes `/stocks?symbol=WTC.AX` and `/api/news`. The stock symbol defaults to WTC.AX. Run one backend app at a time on port 8000.
+
 In a second terminal, start the frontend.
 
 ```sh

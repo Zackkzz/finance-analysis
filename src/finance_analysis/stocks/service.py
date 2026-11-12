@@ -24,8 +24,7 @@ METRICS = (
 )
 logger = logging.getLogger(__name__)
 snapshot_lock = Lock()
-snapshot: StockSnapshot | None = None
-expires_at = 0.0
+snapshots: dict[str, tuple[StockSnapshot, float]] = {}
 
 
 def number(value: object) -> float | None:
@@ -77,9 +76,10 @@ def get_stock(symbol: str) -> StockSnapshot:
     """
         read one stock symbol and fetch the relevant data
     """
-    global snapshot, expires_at
     with snapshot_lock:
-        if snapshot is None or monotonic() >= expires_at:
+        cached = snapshots.get(symbol)
+        if cached is None or monotonic() >= cached[1]:
             snapshot = fetch_stock(symbol)
-            expires_at = monotonic() + CACHE_SECONDS
-        return snapshot
+            snapshots[symbol] = (snapshot, monotonic() + CACHE_SECONDS)
+            return snapshot
+        return cached[0]
