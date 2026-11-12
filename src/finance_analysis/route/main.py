@@ -3,7 +3,6 @@ import logging
 import uvicorn
 from pydantic import BaseModel
 
-from finance_analysis.stock_api import read_stock
 from finance_analysis.stocks.models import StockSnapshot
 from finance_analysis.stocks.news import NewsContent, raw_extract
 from finance_analysis.model.no_tools import require_news_analysis
