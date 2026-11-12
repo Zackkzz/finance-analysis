@@ -1,22 +1,21 @@
-"""Response types shared by stock data retrieval and the API."""
+"""Response models shared by stock data retrieval and the API."""
 
-from typing import TypedDict
+from pydantic import BaseModel
 
 
-class PricePoint(TypedDict):
+class PricePoint(BaseModel):
     date: str
     close: float
     volume: float | None
 
 
-class StockSnapshot(TypedDict):
+class StockSnapshot(BaseModel):
     currency: str
     financialCurrency: str | None
     prices: list[PricePoint]
     metrics: dict[str, float | None]
 
 
-class ErrorResponse(TypedDict):
+class ErrorResponse(BaseModel):
     error: str
-
 

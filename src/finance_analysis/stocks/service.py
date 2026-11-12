@@ -11,7 +11,6 @@ import yfinance as yf
 
 from .models import PricePoint, StockSnapshot
 
-SYMBOL = "WTC.AX"
 CACHE_SECONDS = 300
 METRICS = (
     "marketCap",
@@ -39,8 +38,8 @@ def number(value: object) -> float | None:
     return result if math.isfinite(result) else None
 
 
-def fetch_stock() -> StockSnapshot:
-    ticker = yf.Ticker(SYMBOL)
+def fetch_stock(symbol: str) -> StockSnapshot:
+    ticker = yf.Ticker(symbol)
     history = ticker.history(
         period="1y", interval="1d", auto_adjust=False, actions=False, timeout=8,
     )
@@ -51,11 +50,11 @@ def fetch_stock() -> StockSnapshot:
     for date, row in history.sort_index().iterrows():
         close = number(row["Close"])
         if close is not None:
-            prices.append({
-                "date": pd.Timestamp(cast(pd.Timestamp, date)).date().isoformat(),
-                "close": close,
-                "volume": number(row["Volume"]),
-            })
+            prices.append(PricePoint(
+                date=pd.Timestamp(cast(pd.Timestamp, date)).date().isoformat(),
+                close=close,
+                volume=number(row["Volume"]),
+            ))
     if not prices:
         raise ValueError("Yahoo Finance returned no valid closing prices")
 
@@ -66,18 +65,21 @@ def fetch_stock() -> StockSnapshot:
         info = {}
 
     currency = ticker.history_metadata.get("currency") or info.get("currency") or "AUD"
-    return {
-        "currency": cast(str, currency),
-        "financialCurrency": cast(str | None, info.get("financialCurrency")),
-        "prices": prices,
-        "metrics": {key: number(info.get(key)) for key in METRICS},
-    }
+    return StockSnapshot(
+        currency=cast(str, currency),
+        financialCurrency=cast(str | None, info.get("financialCurrency")),
+        prices=prices,
+        metrics={key: number(info.get(key)) for key in METRICS},
+    )
 
 
-def get_stock() -> StockSnapshot:
+def get_stock(symbol: str) -> StockSnapshot:
+    """
+        read one stock symbol and fetch the relevant data
+    """
     global snapshot, expires_at
     with snapshot_lock:
         if snapshot is None or monotonic() >= expires_at:
-            snapshot = fetch_stock()
+            snapshot = fetch_stock(symbol)
             expires_at = monotonic() + CACHE_SECONDS
         return snapshot
