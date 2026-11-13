@@ -88,9 +88,9 @@ def get_stock(symbol: str) -> StockSnapshot:
 
 """ news service """
 
-def fetch_news(symbol: str, count: int = 10) -> NewsSnapshot:
+def fetch_news(symbol: str, count: int = 10):
     news = yf.Ticker(symbol).get_news()
-    if len(news) < 1:
+    pass
 
 
 def get_news(symbol: str, count: int = 10) -> list[NewsContent]:
