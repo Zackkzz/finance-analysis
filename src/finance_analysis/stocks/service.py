@@ -2,14 +2,14 @@
 
 import logging
 import math
-from threading import Lock
-from time import monotonic
-from typing import SupportsFloat, SupportsIndex, cast
-
 import pandas as pd
 import yfinance as yf
 
+from threading import Lock
+from time import monotonic
+from typing import SupportsFloat, SupportsIndex, cast
 from .models import PricePoint, StockSnapshot
+from .news import raw_extract, NewsContent
 
 CACHE_SECONDS = 300
 METRICS = (
@@ -36,6 +36,7 @@ def number(value: object) -> float | None:
         return None
     return result if math.isfinite(result) else None
 
+""" stocks service """
 
 def fetch_stock(symbol: str) -> StockSnapshot:
     ticker = yf.Ticker(symbol)
@@ -83,3 +84,19 @@ def get_stock(symbol: str) -> StockSnapshot:
             snapshots[symbol] = (snapshot, monotonic() + CACHE_SECONDS)
             return snapshot
         return cached[0]
+
+
+""" news service """
+
+def fetch_news(symbol: str, count: int = 10) -> NewsSnapshot:
+    news = yf.Ticker(symbol).get_news()
+    if len(news) < 1:
+
+
+def get_news(symbol: str, count: int = 10) -> list[NewsContent]:
+    ticker = yf.Ticker(symbol)
+    news = ticker.get_news(count=count)
+    result = raw_extract(news)
+    return result
+
+

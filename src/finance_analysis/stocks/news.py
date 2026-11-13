@@ -53,9 +53,8 @@ class StockTickersList(BaseModel):
 METRICS = ("id", "contentType", "title", "description", "summary", "pubDate")
 
 
-def raw_extract(symbol: str, count: int = 10) -> list[NewsContent]:
-    ticker = yf.Ticker(symbol)
-    news = ticker.get_news(count=count)
+def raw_extract(news: list[dict]) -> list[NewsContent]:
+
     result: list[NewsContent] = []
     for each in news:
         raw_content = each.get("content")
