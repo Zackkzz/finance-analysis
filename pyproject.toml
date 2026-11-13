@@ -17,8 +17,8 @@ dependencies = [
 ]
 
 [project.scripts]
-finance-analysis = "finance_analysis.stock_api:main"
-
+backend = "finance_analysis.route.main:main"
+backend-dev = "finance_analysis.route.main:dev"
 [build-system]
 requires = ["uv_build>=0.13.1,<0.14.0"]
 build-backend = "uv_build"

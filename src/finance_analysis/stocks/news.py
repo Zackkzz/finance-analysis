@@ -50,8 +50,6 @@ class Ticker(BaseModel):
 class StockTickersList(BaseModel):
     tickers: list[Ticker] = Field(default_factory=list)
 
-
-SYMBOL = "WTC.AX"
 METRICS = ("id", "contentType", "title", "description", "summary", "pubDate")
 
 

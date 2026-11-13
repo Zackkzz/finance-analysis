@@ -40,3 +40,6 @@ logs/
 
 # macOS metadata
 .DS_Store
+
+# log files
+*.log

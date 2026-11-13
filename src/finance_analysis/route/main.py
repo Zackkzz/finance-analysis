@@ -39,7 +39,7 @@ def root():
 @app.get("/api/stock", response_model=StockSnapshot)
 def read_stocks(response: Response, symbol: str = "WTC.AX") -> StockSnapshot:
     """Return Yahoo Finance prices and metrics for the requested stock."""
-    return read_stock(response, symbol)
+    return read_stocks(response, symbol)
 
 @app.get("/api/news")
 async def read_news(symbol: str, count: int = 10):
@@ -74,6 +74,13 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO)
     uvicorn.run(app, host="127.0.0.1", port=PORT)
 
+def dev() -> None:
+    uvicorn.run(
+        "finance_analysis.route.main:app",
+        host="127.0.0.1",
+        port=8000,
+        reload=True,
+    )
 
 if __name__ == "__main__":
     main()
