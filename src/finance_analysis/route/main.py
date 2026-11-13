@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from finance_analysis.stocks.models import StockSnapshot
 from finance_analysis.stocks.news import NewsContent, raw_extract
 from finance_analysis.model.no_tools import require_news_analysis
+from finance_analysis.stocks.service import get_news, get_stock
 
 class AnalyzedNewsContent(NewsContent):
     analysis: str | None = None
@@ -39,14 +40,14 @@ def root():
 @app.get("/api/stock", response_model=StockSnapshot)
 def read_stocks(response: Response, symbol: str = "WTC.AX") -> StockSnapshot:
     """Return Yahoo Finance prices and metrics for the requested stock."""
-    return read_stocks(response, symbol)
+    return get_stock(symbol)
 
 @app.get("/api/news")
 async def read_news(symbol: str, count: int = 10):
-    news_content = raw_extract(symbol, count)
+    news_content = get_news(symbol, count)
     model_response = await require_news_analysis(symbol)
     if model_response is None:
-        raise RuntimeError("News analysis did not return a response")
+        raise RuntimeError("Model did not return a response")
 
     response = ModelResponse.model_validate_json(model_response)
     analysis_by_id = {
