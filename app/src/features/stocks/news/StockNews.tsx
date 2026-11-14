@@ -19,6 +19,7 @@ function safeHttpUrl(value: string): string | undefined {
 export function StockNews({ symbol }: { symbol: string }) {
   const { status, data, refresh } = useStockNews(symbol)
   const loading = status === 'loading'
+  const analyzing = status === 'analyzing'
   const articles = data?.articles ?? []
 
   return (
@@ -52,14 +53,14 @@ export function StockNews({ symbol }: { symbol: string }) {
           <aside className="rounded-panel bg-ticker p-6 compact:order-first handset:p-[17px]" aria-labelledby="ai-summary-heading">
             <h3 id="ai-summary-heading" className="font-heading text-[1.25rem] font-bold">AI summary</h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-relaxed wrap-anywhere">
-              {data.summary?.trim() || 'An AI summary is not available for these articles.'}
+              {analyzing ? 'Waiting for model analysis…' : data.summary?.trim() || 'An AI summary is not available for these articles.'}
             </p>
             <p className="mt-4 border-t border-rule pt-3 text-label leading-relaxed text-muted">
               AI-generated interpretation. Read the original reporting for context.
             </p>
           </aside>
           <ol className="col-start-1 row-start-1 divide-y divide-rule rounded-panel border border-rule bg-paper px-6 compact:col-auto compact:row-auto handset:px-[17px]">
-            {articles.map((article) => <NewsItem key={article.id} article={article} />)}
+            {articles.map((article) => <NewsItem key={article.id} article={article} analyzing={analyzing} />)}
           </ol>
         </div>
       ) : loading ? (
@@ -84,7 +85,7 @@ export function StockNews({ symbol }: { symbol: string }) {
   )
 }
 
-function NewsItem({ article }: { article: NewsArticle }) {
+function NewsItem({ article, analyzing }: { article: NewsArticle; analyzing: boolean }) {
   const href = safeHttpUrl(article.canonicalUrl.url)
   const thumbnailUrl = safeHttpUrl(article.thumbnail?.originalUrl ?? '')
   const date = new Date(article.pubDate)
@@ -117,7 +118,7 @@ function NewsItem({ article }: { article: NewsArticle }) {
         <div className="mt-4 border-t border-rule pt-3">
           <h4 className="text-label font-bold text-focus">AI analysis</h4>
           <p className="mt-1.5 max-w-[75ch] whitespace-pre-line text-sm leading-relaxed wrap-anywhere">
-            {article.analysis?.trim() || 'AI analysis is not available for this article.'}
+            {analyzing ? 'Waiting for model analysis…' : article.analysis?.trim() || 'AI analysis is not available for this article.'}
           </p>
         </div>
       </article>
@@ -141,3 +142,4 @@ function NewsThumbnail({ src }: { src: string }) {
     />
   )
 }
+

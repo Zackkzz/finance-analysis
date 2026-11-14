@@ -8,12 +8,14 @@ from finance_analysis.model.no_tools import require_news_analysis
 from finance_analysis.model.schemas import ModelResponse
 from finance_analysis.stocks.service import get_news, get_stock
 
+class StockNewsResponse(BaseModel):
+    symbol: str
+    articles: list[NewsContent]
+
 class AnalyzedNewsContent(NewsContent):
     analysis: str | None = None
 
-
-class StockNewsResponse(BaseModel):
-    symbol: str
+class NewsAnalysisResponse(BaseModel):
     articles: list[AnalyzedNewsContent]
     summary: str | None = None
 
@@ -26,7 +28,6 @@ app = FastAPI()
 def root():
     return {"Server is running": f"on port {PORT}"}
 
-@app.get("/stocks", response_model=StockSnapshot)
 @app.get("/api/stock", response_model=StockSnapshot)
 def read_stocks(response: Response, symbol: str = "WTC.AX") -> StockSnapshot:
     """Return Yahoo Finance prices and metrics for the requested stock."""
@@ -41,31 +42,11 @@ async def read_news(symbol: str, count: int = 10):
             status_code=502,
             detail="The news provider returned an unexpected response.",
         ) from err
-    model_response = await require_news_analysis(symbol, news_content)
-    if not model_response:
-        logger.error("The analysis service returned no response for %s", symbol)
-        raise HTTPException(
-            status_code=502,
-            detail="The analysis service returned no response.",
-        )
 
-    try:
-        response = ModelResponse.model_validate_json(model_response)
-    except ValidationError as err:
-        logger.exception("The analysis service returned invalid JSON or schema for %s", symbol)
-        raise HTTPException(
-            status_code=502,
-            detail="The analysis service returned an unexpected response.",
-        ) from err
-    analysis_by_id = {
-        item.id: item.analysis
-        for item in response.analyses
-    }
     articles = [
-        AnalyzedNewsContent.model_validate(
+        NewsContent.model_validate(
             {
                 **article.model_dump(),
-                "analysis": analysis_by_id.get(article.id),
             }
         )
         for article in news_content
@@ -74,12 +55,10 @@ async def read_news(symbol: str, count: int = 10):
     return StockNewsResponse(
         symbol=symbol,
         articles=articles,
-        summary=response.summary,
     )
 
-# not wired
-@app.post("/api/news/analysis")
-async def get_analysis(symbol: str, news_content: list[NewsContent]):
+@app.post("/api/news/analysis", response_model=NewsAnalysisResponse)
+async def get_news_analysis(symbol: str, news_content: list[NewsContent]) -> NewsAnalysisResponse:
     model_response = await require_news_analysis(symbol, news_content)
     if not model_response:
         logger.error("The analysis service returned no response for %s", symbol)
@@ -108,7 +87,11 @@ async def get_analysis(symbol: str, news_content: list[NewsContent]):
         )
         for article in news_content
     ]
-    return articles
+
+    return NewsAnalysisResponse(
+        articles=articles,
+        summary=response.summary
+    )
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO)

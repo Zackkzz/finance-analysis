@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { fetchNews } from './api'
+import { fetchNews, fetchNewsAnalysis } from './api'
 import type { StockNewsResponse } from './types'
 
 type NewsState = {
   symbol: string
-  status: 'loading' | 'ready' | 'error' | 'unavailable'
+  status: 'loading' | 'analyzing' | 'ready' | 'error' | 'unavailable'
   data: StockNewsResponse | null
 }
 
@@ -19,7 +19,20 @@ export function useStockNews(symbol: string) {
       try {
         const data = await fetchNews(symbol, controller.signal)
         if (!controller.signal.aborted) {
-          setState({ symbol, status: data ? 'ready' : 'unavailable', data })
+          setState({ symbol, status: data ? (data.articles.length > 0 ? 'analyzing' : 'ready') : 'unavailable', data })
+        }
+        if (data && data.articles.length > 0 && !controller.signal.aborted) {
+          try {
+            const analyzed = await fetchNewsAnalysis(symbol, data.articles, controller.signal)
+            if (!controller.signal.aborted) {
+              setState({ symbol, status: 'ready', data: analyzed })
+            }
+          } catch {
+            // Analysis is optional; retain the already displayed news on failure.
+            if (!controller.signal.aborted) {
+              setState({ symbol, status: 'ready', data })
+            }
+          }
         }
       } catch {
         if (!controller.signal.aborted) {
@@ -53,3 +66,5 @@ export function useStockNews(symbol: string) {
 
   return { ...current, refresh }
 }
+
+
