@@ -5,6 +5,7 @@ from pydantic import BaseModel, ValidationError
 from finance_analysis.stocks.models import StockSnapshot
 from finance_analysis.stocks.news import NewsContent
 from finance_analysis.model.no_tools import require_news_analysis
+from finance_analysis.model.schemas import ModelResponse
 from finance_analysis.stocks.service import get_news, get_stock
 
 class AnalyzedNewsContent(NewsContent):
@@ -16,18 +17,8 @@ class StockNewsResponse(BaseModel):
     articles: list[AnalyzedNewsContent]
     summary: str | None = None
 
-class AnalysisItem(BaseModel):
-    id: str
-    analysis: str
-
-class ModelResponse(BaseModel):
-    symbol: str
-    analyses: list[AnalysisItem]
-    summary: str | None
-
-
-
 PORT = 8000
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -51,10 +42,21 @@ async def read_news(symbol: str, count: int = 10):
             detail="The news provider returned an unexpected response.",
         ) from err
     model_response = await require_news_analysis(symbol, news_content)
-    if model_response is None:
-        raise RuntimeError("Model did not return a response")
+    if not model_response:
+        logger.error("The analysis service returned no response for %s", symbol)
+        raise HTTPException(
+            status_code=502,
+            detail="The analysis service returned no response.",
+        )
 
-    response = ModelResponse.model_validate_json(model_response)
+    try:
+        response = ModelResponse.model_validate_json(model_response)
+    except ValidationError as err:
+        logger.exception("The analysis service returned invalid JSON or schema for %s", symbol)
+        raise HTTPException(
+            status_code=502,
+            detail="The analysis service returned an unexpected response.",
+        ) from err
     analysis_by_id = {
         item.id: item.analysis
         for item in response.analyses
@@ -75,6 +77,38 @@ async def read_news(symbol: str, count: int = 10):
         summary=response.summary,
     )
 
+# not wired
+@app.post("/api/news/analysis")
+async def get_analysis(symbol: str, news_content: list[NewsContent]):
+    model_response = await require_news_analysis(symbol, news_content)
+    if not model_response:
+        logger.error("The analysis service returned no response for %s", symbol)
+        raise HTTPException(
+            status_code=502,
+            detail="The analysis service returned no response.",
+        )
+    try:
+        response = ModelResponse.model_validate_json(model_response)
+    except ValidationError as err:
+        logger.exception("The analysis service returned invalid JSON or schema for %s", symbol)
+        raise HTTPException(
+            status_code=502,
+            detail="The analysis service returned an unexpected response.",
+        ) from err
+    analysis_by_id = {
+        item.id: item.analysis
+        for item in response.analyses
+    }
+    articles = [
+        AnalyzedNewsContent.model_validate(
+            {
+                **article.model_dump(),
+                "analysis": analysis_by_id.get(article.id),
+            }
+        )
+        for article in news_content
+    ]
+    return articles
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO)
