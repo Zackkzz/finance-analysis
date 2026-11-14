@@ -5,10 +5,11 @@ import math
 import pandas as pd
 import yfinance as yf
 
+from pydantic import ValidationError
 from threading import Lock
 from time import monotonic
 from typing import SupportsFloat, SupportsIndex, cast
-from .models import PricePoint, StockSnapshot
+from .models import PricePoint, StockSnapshot, NewsList
 from .news import raw_extract, NewsContent
 
 CACHE_SECONDS = 300
@@ -88,14 +89,20 @@ def get_stock(symbol: str) -> StockSnapshot:
 
 """ news service """
 
-def fetch_news(symbol: str, count: int = 10):
-    news = yf.Ticker(symbol).get_news()
-    pass
+def fetch_news(symbol: str, count: int = 10) -> NewsList:
+    raw_news = yf.Ticker(symbol).get_news(count=count)
+    try:
+        return  NewsList(news=raw_news)
+    except ValidationError:
+        logger.exception(
+            "Yahoo Finance returned invalid news for %s", symbol
+        )
+        raise
+
 
 
 def get_news(symbol: str, count: int = 10) -> list[NewsContent]:
-    ticker = yf.Ticker(symbol)
-    news = ticker.get_news(count=count)
+    news = fetch_news(symbol, count)
     result = raw_extract(news)
     return result
 

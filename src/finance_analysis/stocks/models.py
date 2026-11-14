@@ -1,10 +1,13 @@
 """Response models shared by stock data retrieval and the API."""
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 """Ticker model"""
 class Ticker(BaseModel):
     symbol: str
+
+class StockTickersList(BaseModel):
+    tickers: list[Ticker] = Field(default_factory=list)
 
 """Stocks' models"""
 
@@ -74,6 +77,9 @@ class FullNewsContent(NewsContent):
     isHosted: bool
     finance: Finance | None = None
 
-class NewsSnapshot:
+class NewsSnapshot(BaseModel):
     id: str
     content: NewsContent
+
+class NewsList(BaseModel):
+    news: list[NewsSnapshot]

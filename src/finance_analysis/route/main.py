@@ -1,10 +1,9 @@
-from fastapi import FastAPI, Response
 import logging
 import uvicorn
-from pydantic import BaseModel
-
+from fastapi import FastAPI, HTTPException, Response
+from pydantic import BaseModel, ValidationError
 from finance_analysis.stocks.models import StockSnapshot
-from finance_analysis.stocks.news import NewsContent, raw_extract
+from finance_analysis.stocks.news import NewsContent
 from finance_analysis.model.no_tools import require_news_analysis
 from finance_analysis.stocks.service import get_news, get_stock
 
@@ -44,8 +43,14 @@ def read_stocks(response: Response, symbol: str = "WTC.AX") -> StockSnapshot:
 
 @app.get("/api/news")
 async def read_news(symbol: str, count: int = 10):
-    news_content = get_news(symbol, count)
-    model_response = await require_news_analysis(symbol)
+    try:
+        news_content = get_news(symbol, count)
+    except ValidationError as err:
+        raise HTTPException(
+            status_code=502,
+            detail="The news provider returned an unexpected response.",
+        ) from err
+    model_response = await require_news_analysis(symbol, news_content)
     if model_response is None:
         raise RuntimeError("Model did not return a response")
 

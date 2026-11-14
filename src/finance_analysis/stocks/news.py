@@ -1,62 +1,17 @@
 """Validate news content returned by Yahoo Finance."""
 
 from datetime import datetime
-
+from pydantic import ValidationError
 import yfinance as yf
-from pydantic import BaseModel, Field, ValidationError
-
-
-class Url(BaseModel):
-    url: str
-
-
-class ContentProvider(BaseModel):
-    displayName: str
-    url: str
-
-
-class ThumbNailResolution(Url):
-    width: int
-    height: int
-    tag: str
-
-
-class ThumbNail(BaseModel):
-    originalUrl: str
-    originalWidth: int
-    originalHeight: int
-    resolutions: list[ThumbNailResolution]
-
-
-class NewsContent(BaseModel):
-    id: str
-    contentType: str
-    title: str
-    description: str | None
-    summary: str | None
-    pubDate: datetime
-    displayTime: datetime
-    previewUrl: str | None
-    provider: ContentProvider
-    canonicalUrl: Url
-    clickThroughUrl: Url | None
-    thumbnail: ThumbNail | None
-
-
-class Ticker(BaseModel):
-    symbol: str
-
-
-class StockTickersList(BaseModel):
-    tickers: list[Ticker] = Field(default_factory=list)
+from .models import NewsList, NewsContent
 
 METRICS = ("id", "contentType", "title", "description", "summary", "pubDate")
 
-
-def raw_extract(news: list[dict]) -> list[NewsContent]:
-
+def raw_extract(news: NewsList) -> list[NewsContent]:
+    list_news = news.news
     result: list[NewsContent] = []
-    for each in news:
+    for each in list_news:
+        each = each.model_dump()
         raw_content = each.get("content")
         try:
             content = NewsContent.model_validate(raw_content)
