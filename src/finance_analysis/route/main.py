@@ -1,13 +1,15 @@
 import logging
+
 import uvicorn
-import yfinance as yf
 from fastapi import FastAPI, HTTPException, Response
-from pydantic import BaseModel, ValidationError
-from finance_analysis.stocks.models import StockSnapshot
-from finance_analysis.stocks.news import NewsContent
 from finance_analysis.model.no_tools import require_news_analysis
 from finance_analysis.model.schemas import ModelResponse
-from finance_analysis.stocks.service import get_news, get_stock
+from finance_analysis.service.search import search
+from finance_analysis.service.schemas import StockSnapshot
+from finance_analysis.service.news import get_news, NewsContent
+from finance_analysis.service.stocks.service import get_stock
+from pydantic import BaseModel, ValidationError
+
 
 class StockNewsResponse(BaseModel):
     symbol: str
@@ -25,55 +27,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-@app.get("/")
-def root():
-    return {"Server is running": f"on port {PORT}"}
-
-@app.get("/api/search")
-def search(input: str, limit: int = 10, type: str | None = None):
-    if type is None:
-        return yf.Search(input, max_results=limit)
-    elif type == 'quotes':
-        return yf.Search(input, max_results=limit).quotes
-    elif type == 'news':
-        return yf.Search(input, max_results=limit).news
-    elif type == 'research':
-        return yf.Search(input, max_results=limit).research
-    else:
-        raise HTTPException(
-            status_code=422,
-            detail="The given `type` query is incorrect."
-        )
-
-@app.get("/api/stock", response_model=StockSnapshot)
-def read_stocks(response: Response, symbol: str = "WTC.AX") -> StockSnapshot:
-    """Return Yahoo Finance prices and metrics for the requested stock."""
-    return get_stock(symbol)
-
-@app.get("/api/news")
-async def read_news(symbol: str, count: int = 10):
-    try:
-        news_content = get_news(symbol, count)
-    except ValidationError as err:
-        raise HTTPException(
-            status_code=502,
-            detail="The news provider returned an unexpected response.",
-        ) from err
-
-    articles = [
-        NewsContent.model_validate(
-            {
-                **article.model_dump(),
-            }
-        )
-        for article in news_content
-    ]
-
-    return StockNewsResponse(
-        symbol=symbol,
-        articles=articles,
-    )
-
+# Post Requests
 @app.post("/api/news/analysis", response_model=NewsAnalysisResponse)
 async def get_news_analysis(symbol: str, news_content: list[NewsContent]) -> NewsAnalysisResponse:
     model_response = await require_news_analysis(symbol, news_content)
@@ -109,6 +63,52 @@ async def get_news_analysis(symbol: str, news_content: list[NewsContent]) -> New
         articles=articles,
         summary=response.summary
     )
+
+# Get Requests
+@app.get("/")
+def root():
+    return {"Server is running": f"on port {PORT}"}
+
+@app.get("/api/search")
+def get_search(input: str, limit: int = 10, type: str | None = None):
+    try:
+        search(input, limit, type)
+    except ValueError as err:
+        raise HTTPException(
+            status_code=422,
+            detail="The given `type` query is incorrect."
+        ) from err
+
+@app.get("/api/stock", response_model=StockSnapshot)
+def read_stocks(response: Response, symbol: str = "WTC.AX") -> StockSnapshot:
+    """Return Yahoo Finance prices and metrics for the requested stock."""
+    return get_stock(symbol)
+
+@app.get("/api/news")
+async def read_news(symbol: str, count: int = 10):
+    try:
+        news_content = get_news(symbol, count)
+    except ValidationError as err:
+        raise HTTPException(
+            status_code=502,
+            detail="The news provider returned an unexpected response.",
+        ) from err
+
+    articles = [
+        NewsContent.model_validate(
+            {
+                **article.model_dump(),
+            }
+        )
+        for article in news_content
+    ]
+
+    return StockNewsResponse(
+        symbol=symbol,
+        articles=articles,
+    )
+
+
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO)

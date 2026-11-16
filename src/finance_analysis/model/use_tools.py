@@ -1,9 +1,10 @@
 import asyncio
 import json
 
-from ollama import AsyncClient, RequestError, ResponseError
 from finance_analysis.model.tools import STOCK_NEWS_TOOL
-from finance_analysis.stocks.news import raw_extract
+from finance_analysis.service.stocks.news import raw_extract
+from ollama import AsyncClient, RequestError, ResponseError
+
 HOST = "http://localhost:11434"
 
 MODEL = "qwen3.5:9b"

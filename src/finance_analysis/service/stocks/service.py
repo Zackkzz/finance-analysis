@@ -2,15 +2,15 @@
 
 import logging
 import math
-import pandas as pd
-import yfinance as yf
-
-from pydantic import ValidationError
 from threading import Lock
 from time import monotonic
 from typing import SupportsFloat, SupportsIndex, cast
-from .models import PricePoint, StockSnapshot, NewsList
-from .news import raw_extract, NewsContent
+
+import pandas as pd
+import yfinance as yf
+from pydantic import ValidationError
+
+from ..schemas import NewsList, PricePoint, StockSnapshot
 
 CACHE_SECONDS = 300
 METRICS = (
@@ -85,25 +85,5 @@ def get_stock(symbol: str) -> StockSnapshot:
             snapshots[symbol] = (snapshot, monotonic() + CACHE_SECONDS)
             return snapshot
         return cached[0]
-
-
-""" news service """
-
-def fetch_news(symbol: str, count: int = 10) -> NewsList:
-    raw_news = yf.Ticker(symbol).get_news(count=count)
-    try:
-        return  NewsList(news=raw_news)
-    except ValidationError:
-        logger.exception(
-            "Yahoo Finance returned invalid news for %s", symbol
-        )
-        raise
-
-
-
-def get_news(symbol: str, count: int = 10) -> list[NewsContent]:
-    news = fetch_news(symbol, count)
-    result = raw_extract(news)
-    return result
 
 

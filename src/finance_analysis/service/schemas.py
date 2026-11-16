@@ -1,5 +1,6 @@
 """Response models shared by stock data retrieval and the API."""
 from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 """Ticker model"""

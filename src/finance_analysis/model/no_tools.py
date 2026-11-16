@@ -1,11 +1,9 @@
-import asyncio
 import json
 
-from ollama import AsyncClient, RequestError, ResponseError
-from finance_analysis.model.tools import STOCK_NEWS_TOOL
-from finance_analysis.stocks.news import raw_extract, NewsContent
 from finance_analysis.model.prompt import BUILD_NEWS_MESSAGES_PROMPT
 from finance_analysis.model.schemas import ModelResponse
+from finance_analysis.service.news import NewsContent
+from ollama import AsyncClient, RequestError, ResponseError
 
 HOST = "http://localhost:11434"
 
