@@ -1,6 +1,6 @@
 """Response models shared by stock data retrieval and the API."""
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 """Ticker model"""
 class Ticker(BaseModel):
@@ -8,6 +8,19 @@ class Ticker(BaseModel):
 
 class StockTickersList(BaseModel):
     tickers: list[Ticker] = Field(default_factory=list)
+
+class LookupResult(BaseModel):
+    """A financial instrument returned by Yahoo Finance lookup."""
+
+    model_config = ConfigDict(extra="allow")
+
+    symbol: str
+    exchange: str | None = None
+    shortname: str | None = None
+    longname: str | None = None
+    quoteType: str | None = None
+    typeDisp: str | None = None
+    exchDisp: str | None = None
 
 """Stocks' models"""
 

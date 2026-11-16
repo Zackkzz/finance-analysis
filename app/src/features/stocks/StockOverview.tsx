@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
+import { StockSearch } from './components/StockSearch'
 import { decimal, formatDate, signed } from './format'
 import { PriceChart } from './components/PriceChart'
-import type { StockSnapshot } from './types'
+import type { StockSnapshot, StockMatch } from './types'
 import { useStock } from './useStock'
 import { StockNews } from './news/StockNews'
 import { STOCK_SYMBOL } from './api'
@@ -21,23 +23,33 @@ function MarketMark() {
 }
 
 export function StockOverview() {
-  const { state, retry } = useStock()
+  const [selection, setSelection] = useState<StockMatch>({ symbol: STOCK_SYMBOL, name: 'WiseTech Global', exchange: 'Australian Securities Exchange', type: 'Equity' })
+  return <>
+      <header className="border-b border-rule bg-paper">
+        <div className="page-width flex min-h-16 items-center justify-between gap-5 py-3 handset:flex-wrap handset:gap-3">
+          <div className="flex items-center gap-2.5 font-[750]"><MarketMark /> Market brief</div>
+          <StockSearch onSelect={setSelection} />
+        </div>
+      </header>
+    <StockView key={selection.symbol} selection={selection} />
+  </>
+}
+
+function StockView({ selection }: { selection: StockMatch }) {
+  const { state, retry } = useStock(selection.symbol)
+  useEffect(() => {
+    document.title = `${selection.name} (${selection.symbol}) | Market brief`
+  }, [selection.name, selection.symbol])
 
   return (
     <>
-      <header className="border-b border-rule bg-paper">
-        <div className="page-width flex min-h-16 items-center justify-between gap-3 handset:min-h-[54px]">
-          <div className="flex items-center gap-2.5 font-[750]"><MarketMark /> Market brief</div>
-          <div className="text-label text-muted">Australian equities</div>
-        </div>
-      </header>
       <main className="page-width">
         <div className="flex items-end justify-between gap-6 pt-[43px] pb-[30px] handset:grid handset:gap-5 handset:pt-[26px] handset:pb-[22px]">
-          <div>
-            <h1 className="text-[3.5rem]/[1.06] tracking-[-0.02em] handset:text-[2.55rem]/[1.06]">WiseTech Global</h1>
+          <div className="min-w-0">
+            <h1 className="text-[3.5rem]/[1.06] wrap-anywhere tracking-[-0.02em] handset:text-[2.55rem]/[1.06]">{selection.name}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-[7px] text-[0.85rem] text-muted">
-              <span className="rounded-sm bg-ticker px-2 py-[3px] font-[730] tracking-[0.025em] text-ink">{STOCK_SYMBOL}</span>
-              <span>Australian Securities Exchange</span>
+              <span className="rounded-sm bg-ticker px-2 py-[3px] font-[730] tracking-[0.025em] text-ink">{selection.symbol}</span>
+              <span>{selection.exchange}</span>
             </div>
           </div>
           {state.status === 'ready' && <Quote stock={state.stock} />}
@@ -61,9 +73,9 @@ export function StockOverview() {
             </section>
           </div>
         )}
-        <StockNews symbol={STOCK_SYMBOL} />
+        <StockNews key={selection.symbol} symbol={selection.symbol} />
         <footer className="flex flex-wrap justify-between gap-x-4 gap-y-1.5 pt-4 pb-7 text-[0.78rem] text-muted">
-          <span>Source <a className="underline underline-offset-[0.2em] hover:text-focus" href="https://finance.yahoo.com/quote/WTC.AX/">Yahoo Finance</a></span>
+          <span>Source <a className="underline underline-offset-[0.2em] hover:text-focus" href={`https://finance.yahoo.com/quote/${encodeURIComponent(selection.symbol)}/`}>Yahoo Finance</a></span>
           <span>Daily data may be delayed.</span>
         </footer>
       </main>

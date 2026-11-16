@@ -1,5 +1,6 @@
 import logging
 import uvicorn
+import yfinance as yf
 from fastapi import FastAPI, HTTPException, Response
 from pydantic import BaseModel, ValidationError
 from finance_analysis.stocks.models import StockSnapshot
@@ -27,6 +28,22 @@ app = FastAPI()
 @app.get("/")
 def root():
     return {"Server is running": f"on port {PORT}"}
+
+@app.get("/api/search")
+def search(input: str, limit: int = 10, type: str | None = None):
+    if type is None:
+        return yf.Search(input, max_results=limit)
+    elif type == 'quotes':
+        return yf.Search(input, max_results=limit).quotes
+    elif type == 'news':
+        return yf.Search(input, max_results=limit).news
+    elif type == 'research':
+        return yf.Search(input, max_results=limit).research
+    else:
+        raise HTTPException(
+            status_code=422,
+            detail="The given `type` query is incorrect."
+        )
 
 @app.get("/api/stock", response_model=StockSnapshot)
 def read_stocks(response: Response, symbol: str = "WTC.AX") -> StockSnapshot:

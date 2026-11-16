@@ -80,3 +80,29 @@
   @apply min-w-0 rounded-panel bg-navy px-[27px] pt-[25px] pb-5 text-on-navy handset:p-[17px];
   --focus-ring: var(--color-trace);
 }
+
+@layer components {
+  .stock-search { position: relative; width: min(100%, 420px); }
+  .search-field { display: flex; align-items: center; min-height: 44px; gap: 10px; padding-left: 13px; border: 1px solid var(--color-rule); border-radius: 6px; background: var(--color-canvas); }
+  .search-field:focus-within { border-color: var(--color-focus); outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  .search-field svg, .search-arrow { width: 18px; height: 18px; flex-shrink: 0; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .search-field > svg { color: var(--color-muted); }
+  .search-field input { width: 100%; min-width: 0; padding: 11px 0; font-size: 0.9rem; caret-color: var(--color-focus); outline: none; }
+  .search-field input::placeholder { color: var(--color-muted); opacity: 1; }
+  .search-clear { display: grid; place-items: center; min-width: 44px; min-height: 44px; color: var(--color-muted); cursor: pointer; }
+  .search-clear:hover { color: var(--color-ink); background: var(--color-ticker); }
+  .search-popover { position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 20; border: 1px solid var(--color-rule); border-radius: 6px; background: var(--color-paper); overflow: hidden; }
+  .search-caption { padding: 12px 14px; color: var(--color-muted); font-size: var(--text-label); border-bottom: 1px solid var(--color-rule); }
+  .search-popover ul { max-height: min(360px, 55dvh); overflow-y: auto; scrollbar-color: var(--color-muted) var(--color-paper); scrollbar-width: thin; }
+  .search-result { display: flex; align-items: center; gap: 12px; padding: 12px 14px; min-height: 64px; border-bottom: 1px solid var(--color-rule); cursor: pointer; }
+  .search-result.is-active { background: var(--color-ticker); }
+  .search-symbol { min-width: 6.5ch; max-width: 13ch; overflow-wrap: anywhere; font-size: 0.85rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+  .search-name { flex: 1; min-width: 0; font-size: 0.9rem; overflow-wrap: anywhere; }
+  .search-exchange { display: block; margin-top: 4px; color: var(--color-muted); font-size: var(--text-label); }
+  .search-arrow { color: var(--color-focus); }
+  .search-message { padding: 18px 14px; color: var(--color-muted); font-size: 0.9rem; overflow-wrap: anywhere; }
+  .search-message:empty { display: none; }
+  .search-message button { color: var(--color-focus); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; min-height: 44px; }
+  .search-hint { padding: 10px 14px; color: var(--color-muted); font-size: var(--text-label); }
+  @media (width <= 570px) { .stock-search { width: 100%; } }
+}

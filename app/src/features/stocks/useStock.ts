@@ -7,7 +7,7 @@ type StockState =
   | { status: 'error'; message: string }
   | { status: 'ready'; stock: StockSnapshot }
 
-export function useStock() {
+export function useStock(symbol: string) {
   const [state, setState] = useState<StockState>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)
 
@@ -20,7 +20,7 @@ export function useStock() {
 
     async function loadStock() {
       try {
-        const stock = await fetchStock(controller.signal)
+        const stock = await fetchStock(symbol, controller.signal)
         if (!controller.signal.aborted) setState({ status: 'ready', stock })
       } catch (error) {
         if (!controller.signal.aborted) {
@@ -39,7 +39,7 @@ export function useStock() {
       window.clearTimeout(timeout)
       controller.abort()
     }
-  }, [attempt])
+  }, [attempt, symbol])
 
   function retry() {
     setState({ status: 'loading' })

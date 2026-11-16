@@ -1,4 +1,4 @@
-import type { PricePoint, StockSnapshot } from './types'
+import type { PricePoint, StockSnapshot, StockMatch } from './types'
 
 export const STOCK_SYMBOL = 'WTC.AX'
 export const STOCK_ENDPOINT = '/api/stock'
@@ -23,8 +23,8 @@ function nullableMetric(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null
 }
 
-export async function fetchStock(signal: AbortSignal): Promise<StockSnapshot> {
-  const query = new URLSearchParams({ symbol: STOCK_SYMBOL })
+export async function fetchStock(symbol: string, signal: AbortSignal): Promise<StockSnapshot> {
+  const query = new URLSearchParams({ symbol })
   const response = await fetch(`${STOCK_ENDPOINT}?${query}`, { signal })
   const data: unknown = await response.json().catch(() => null)
 
@@ -63,4 +63,25 @@ export async function fetchStock(signal: AbortSignal): Promise<StockSnapshot> {
       freeCashflow: nullableMetric(metrics.freeCashflow),
     },
   }
+}
+
+export async function searchStocks(input: string, signal: AbortSignal): Promise<StockMatch[]> {
+  const query = new URLSearchParams({ input, limit: '8', type: 'quotes' })
+  const response = await fetch(`/api/search?${query}`, { signal })
+  if (!response.ok) throw new Error('Search is unavailable.')
+  const data: unknown = await response.json()
+  if (!Array.isArray(data)) throw new Error('Invalid search response.')
+  const matches: StockMatch[] = []
+  for (const item of data) {
+    if (!isRecord(item) || typeof item.symbol !== 'string' || !item.symbol.trim()) continue
+    if (matches.some((match) => match.symbol === item.symbol)) continue
+    const text = (value: unknown) => typeof value === 'string' ? value : ''
+    matches.push({
+      symbol: item.symbol,
+      name: text(item.shortname) || text(item.longname) || item.symbol,
+      exchange: text(item.exchDisp) || text(item.exchange),
+      type: text(item.typeDisp) || text(item.quoteType),
+    })
+  }
+  return matches
 }

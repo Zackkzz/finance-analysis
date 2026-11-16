@@ -15,3 +15,5 @@ export type StockSnapshot = {
     freeCashflow: number | null
   }
 }
+
+export type StockMatch = { symbol: string; name: string; exchange: string; type: string }

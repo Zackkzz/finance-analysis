@@ -9,7 +9,7 @@ from finance_analysis.model.schemas import ModelResponse
 
 HOST = "http://localhost:11434"
 
-MODEL = "qwen3.5:4b"
+MODEL = "qwen3.5:9b"
 
 def build_news_messages(
     symbol: str,

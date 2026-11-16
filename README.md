@@ -6,7 +6,7 @@ A self-written app for financial analysis. Frontend designed by AI.
 
 - gather market information and news content using [yfinance](https://github.com/ranaroussi/yfinance).
 - local AI model to analyse news and generate summary.
-- currently don't support lookup, only use `WTC.AX`.
+- search by company name or symbol and select a security to load its prices, market figures, and news.
 
 ## Stack
 
@@ -39,7 +39,7 @@ npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. The Python API listens on port 8000, and Vite proxies `/api/stock` to it. The API caches successful responses for five minutes. An internet connection is required for Yahoo Finance data.
+Open the local URL printed by Vite. The Python API listens on port 8000, and Vite proxies `/api` to it. The API caches successful responses for five minutes. An internet connection is required for Yahoo Finance data.
 
 Open the [interactive API documentation](http://127.0.0.1:8000/docs) while the backend is running.
 
