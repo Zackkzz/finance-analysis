@@ -106,3 +106,82 @@
   .search-hint { padding: 10px 14px; color: var(--color-muted); font-size: var(--text-label); }
   @media (width <= 570px) { .stock-search { width: 100%; } }
 }
+
+@layer components {
+  .statement-scroll {
+    position: relative;
+    overflow-x: auto;
+    scrollbar-color: var(--color-muted) var(--color-paper);
+  }
+
+  .statement-scroll:focus-visible { outline-offset: -3px; }
+
+  .statement-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .statement-table th,
+  .statement-table td {
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--color-rule);
+  }
+
+  .statement-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    width: 28%;
+    min-width: 220px;
+    max-width: 260px;
+    background: var(--color-paper);
+    border-right: 1px solid var(--color-rule);
+    text-align: left;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  .statement-table th:not(:first-child),
+  .statement-table td {
+    min-width: 118px;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .statement-table thead th,
+  .statement-table thead th:first-child {
+    background: var(--color-navy);
+    color: var(--color-on-navy);
+    border-color: var(--color-plot-grid);
+    font-weight: 700;
+    padding-block: 13px;
+  }
+
+  .statement-table .statement-group th,
+  .statement-table .statement-group td {
+    background: var(--color-canvas);
+    color: var(--color-muted);
+    font-size: var(--text-label);
+    font-weight: 700;
+  }
+
+  .statement-table .statement-total th,
+  .statement-table .statement-total td {
+    font-weight: 750;
+  }
+
+  .statement-table tbody tr:not(.statement-group):hover > * {
+    background: var(--color-canvas);
+  }
+
+  .statement-table tbody:last-child tr:last-child > * { border-bottom: 0; }
+
+  @media (width <= 570px) {
+    .statement-table th, .statement-table td { padding-inline: 12px; }
+    .statement-table th:first-child { min-width: 140px; max-width: 152px; }
+    .statement-table th:not(:first-child), .statement-table td { min-width: 102px; }
+  }
+}

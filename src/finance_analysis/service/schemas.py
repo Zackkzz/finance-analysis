@@ -1,14 +1,19 @@
 """Response models shared by stock data retrieval and the API."""
+
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel
 
 """Ticker model"""
+
+
 class Ticker(BaseModel):
     symbol: str
 
+
 class StockTickersList(BaseModel):
     tickers: list[Ticker] = Field(default_factory=list)
+
 
 class LookupResult(BaseModel):
     """A financial instrument returned by Yahoo Finance lookup."""
@@ -23,7 +28,9 @@ class LookupResult(BaseModel):
     typeDisp: str | None = None
     exchDisp: str | None = None
 
+
 """Stocks Models"""
+
 
 class PricePoint(BaseModel):
     date: str
@@ -31,17 +38,13 @@ class PricePoint(BaseModel):
     volume: float | None
 
 
-class StockSnapshot(BaseModel):
-    currency: str
-    financialCurrency: str | None
-    prices: list[PricePoint]
-    metrics: dict[str, float | None]
-
-
 class ErrorResponse(BaseModel):
     error: str
 
+
 """News Models"""
+
+
 class Url(BaseModel):
     url: str
 
@@ -62,6 +65,7 @@ class ThumbNail(BaseModel):
     originalWidth: int
     originalHeight: int
     resolutions: list[ThumbNailResolution]
+
 
 class PremiumFinance(BaseModel):
     isPremiumNews: bool
@@ -98,8 +102,6 @@ class NewsSnapshot(BaseModel):
 class NewsList(BaseModel):
     news: list[NewsSnapshot]
 
-
-
 """Financial Models"""
 class IncomeStatement(BaseModel):
     """Income statement metrics for one reporting period."""
@@ -119,7 +121,9 @@ class IncomeStatement(BaseModel):
         alias="Net Income From Continuing Operation Net Minority Interest",
         default=None,
     )
-    reconciled_depreciation: float | None = Field(alias="Reconciled Depreciation", default=None)
+    reconciled_depreciation: float | None = Field(
+        alias="Reconciled Depreciation", default=None
+    )
     reconciled_cost_of_revenue: float | None = Field(
         alias="Reconciled Cost Of Revenue", default=None
     )
@@ -132,8 +136,12 @@ class IncomeStatement(BaseModel):
     net_income_from_continuing_and_discontinued_operation: float | None = Field(
         alias="Net Income From Continuing And Discontinued Operation", default=None
     )
-    diluted_average_shares: float | None = Field(alias="Diluted Average Shares", default=None)
-    basic_average_shares: float | None = Field(alias="Basic Average Shares", default=None)
+    diluted_average_shares: float | None = Field(
+        alias="Diluted Average Shares", default=None
+    )
+    basic_average_shares: float | None = Field(
+        alias="Basic Average Shares", default=None
+    )
     diluted_eps: float | None = Field(alias="Diluted EPS", default=None)
     basic_eps: float | None = Field(alias="Basic EPS", default=None)
     net_income_common_stockholders: float | None = Field(
@@ -148,18 +156,24 @@ class IncomeStatement(BaseModel):
     )
     tax_provision: float | None = Field(alias="Tax Provision", default=None)
     pretax_income: float | None = Field(alias="Pretax Income", default=None)
-    other_income_expense: float | None = Field(alias="Other Income Expense", default=None)
+    other_income_expense: float | None = Field(
+        alias="Other Income Expense", default=None
+    )
     other_non_operating_income_expenses: float | None = Field(
         alias="Other Non Operating Income Expenses", default=None
     )
-    special_income_charges: float | None = Field(alias="Special Income Charges", default=None)
+    special_income_charges: float | None = Field(
+        alias="Special Income Charges", default=None
+    )
     restructuring_and_mergern_acquisition: float | None = Field(
         alias="Restructuring And Mergern Acquisition", default=None
     )
     net_non_operating_interest_income_expense: float | None = Field(
         alias="Net Non Operating Interest Income Expense", default=None
     )
-    total_other_finance_cost: float | None = Field(alias="Total Other Finance Cost", default=None)
+    total_other_finance_cost: float | None = Field(
+        alias="Total Other Finance Cost", default=None
+    )
     interest_expense_non_operating: float | None = Field(
         alias="Interest Expense Non Operating", default=None
     )
@@ -168,7 +182,9 @@ class IncomeStatement(BaseModel):
     )
     operating_income: float | None = Field(alias="Operating Income", default=None)
     operating_expense: float | None = Field(alias="Operating Expense", default=None)
-    other_operating_expenses: float | None = Field(alias="Other Operating Expenses", default=None)
+    other_operating_expenses: float | None = Field(
+        alias="Other Operating Expenses", default=None
+    )
     depreciation_amortization_depletion_income_statement: float | None = Field(
         alias="Depreciation Amortization Depletion Income Statement", default=None
     )
@@ -199,7 +215,6 @@ class IncomeStatement(BaseModel):
     cost_of_revenue: float | None = Field(alias="Cost Of Revenue", default=None)
     total_revenue: float | None = Field(alias="Total Revenue", default=None)
     operating_revenue: float | None = Field(alias="Operating Revenue", default=None)
-
 
 class GetIncomeStmtResult(RootModel[dict[datetime, IncomeStatement]]):
     """Income statement values keyed by report date."""

@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react'
-import { StockSearch } from './components/StockSearch'
 import { decimal, formatDate, signed } from './format'
 import { PriceChart } from './components/PriceChart'
 import type { StockSnapshot, StockMatch } from './types'
 import { useStock } from './useStock'
 import { StockNews } from './news/StockNews'
-import { STOCK_SYMBOL } from './api'
 
 const compact = new Intl.NumberFormat('en-AU', { notation: 'compact', maximumFractionDigits: 2 })
 const missing = 'Unavailable'
@@ -14,32 +11,8 @@ const statusPanel = 'grid flex-1 place-content-center justify-items-center gap-4
 const formatMoney = (value: number | null, currency: string | null) =>
   value === null || !currency ? missing : `${compact.format(value)} ${currency}`
 
-function MarketMark() {
-  return (
-    <svg className="size-6 text-focus" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M3 18h18M4 13l5-5 5 3 6-6M15 5h5v5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-export function StockOverview() {
-  const [selection, setSelection] = useState<StockMatch>({ symbol: STOCK_SYMBOL, name: 'WiseTech Global', exchange: 'Australian Securities Exchange', type: 'Equity' })
-  return <>
-      <header className="border-b border-rule bg-paper">
-        <div className="page-width flex min-h-16 items-center justify-between gap-5 py-3 handset:flex-wrap handset:gap-3">
-          <div className="flex items-center gap-2.5 font-[750]"><MarketMark /> Market brief</div>
-          <StockSearch onSelect={setSelection} />
-        </div>
-      </header>
-    <StockView key={selection.symbol} selection={selection} />
-  </>
-}
-
-function StockView({ selection }: { selection: StockMatch }) {
+export function StockOverview({ selection }: { selection: StockMatch }) {
   const { state, retry } = useStock(selection.symbol)
-  useEffect(() => {
-    document.title = `${selection.name} (${selection.symbol}) | Market brief`
-  }, [selection.name, selection.symbol])
 
   return (
     <>

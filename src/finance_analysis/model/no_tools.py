@@ -20,10 +20,7 @@ def build_news_messages(
             "content": json.dumps(
                 {
                     "symbol": symbol,
-                    "articles": [
-                        article.model_dump(mode="json")
-                        for article in news
-                    ],
+                    "articles": [article.model_dump(mode="json") for article in news],
                 },
                 ensure_ascii=False,
             ),
@@ -49,4 +46,3 @@ async def require_news_analysis(
 
     except (RequestError, ResponseError) as err:
         print("Error:", err.error)
-

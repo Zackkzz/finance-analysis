@@ -9,9 +9,7 @@ HOST = "http://localhost:11434"
 
 MODEL = "qwen3.5:9b"
 
-available_tools = {
-    "raw_extract": raw_extract
-}
+available_tools = {"raw_extract": raw_extract}
 
 messages = [
     {
@@ -19,6 +17,7 @@ messages = [
         "content": "Get the latest news for WTC.AX and do a simple analysis for each result",
     }
 ]
+
 
 async def main() -> None:
     try:
@@ -44,12 +43,14 @@ async def main() -> None:
                     raise ValueError(f"Unknown tool requested: {name}")
 
                 result = function(**arguments)
-                messages.append({
-                    "role": "tool",
-                    "content": json.dumps(
-                        [item.model_dump(mode="json") for item in result]
-                    ),
-                })
+                messages.append(
+                    {
+                        "role": "tool",
+                        "content": json.dumps(
+                            [item.model_dump(mode="json") for item in result]
+                        ),
+                    }
+                )
 
     except (RequestError, ResponseError) as err:
         print("Error:", err.error)
