@@ -8,9 +8,9 @@ from typing import SupportsFloat, SupportsIndex, cast
 
 import pandas as pd
 import yfinance as yf
-from pydantic import ValidationError
 
-from ..schemas import NewsList, PricePoint, StockSnapshot
+from ..schemas import PricePoint
+from finance_analysis.route.schemas import StockSnapshot
 
 CACHE_SECONDS = 300
 METRICS = (
@@ -37,12 +37,18 @@ def number(value: object) -> float | None:
         return None
     return result if math.isfinite(result) else None
 
+
 """ stocks service """
+
 
 def fetch_stock(symbol: str) -> StockSnapshot:
     ticker = yf.Ticker(symbol)
     history = ticker.history(
-        period="1y", interval="1d", auto_adjust=False, actions=False, timeout=8,
+        period="1y",
+        interval="1d",
+        auto_adjust=False,
+        actions=False,
+        timeout=8,
     )
     if history.empty:
         raise ValueError("Yahoo Finance returned no price history")
@@ -51,11 +57,13 @@ def fetch_stock(symbol: str) -> StockSnapshot:
     for date, row in history.sort_index().iterrows():
         close = number(row["Close"])
         if close is not None:
-            prices.append(PricePoint(
-                date=pd.Timestamp(cast(pd.Timestamp, date)).date().isoformat(),
-                close=close,
-                volume=number(row["Volume"]),
-            ))
+            prices.append(
+                PricePoint(
+                    date=pd.Timestamp(cast(pd.Timestamp, date)).date().isoformat(),
+                    close=close,
+                    volume=number(row["Volume"]),
+                )
+            )
     if not prices:
         raise ValueError("Yahoo Finance returned no valid closing prices")
 
@@ -76,7 +84,7 @@ def fetch_stock(symbol: str) -> StockSnapshot:
 
 def get_stock(symbol: str) -> StockSnapshot:
     """
-        read one stock symbol and fetch the relevant data
+    read one stock symbol and fetch the relevant data
     """
     with snapshot_lock:
         cached = snapshots.get(symbol)
@@ -85,5 +93,3 @@ def get_stock(symbol: str) -> StockSnapshot:
             snapshots[symbol] = (snapshot, monotonic() + CACHE_SECONDS)
             return snapshot
         return cached[0]
-
-

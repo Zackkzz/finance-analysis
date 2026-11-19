@@ -35,5 +35,5 @@ BUILD_NEWS_MESSAGES_PROMPT = {
     Return exactly one analysis per article in the original order.
     Preserve IDs exactly. Use plain text inside JSON strings.
     For an empty article list, return analyses [] and summary null.
-    """.strip()
+    """.strip(),
 }

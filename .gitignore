@@ -43,3 +43,6 @@ logs/
 
 # log files
 *.log
+
+# dev files
+*.ipynb
