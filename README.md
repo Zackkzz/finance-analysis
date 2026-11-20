@@ -4,9 +4,10 @@ A self-written app for financial analysis. Frontend designed by AI.
 
 ## Feature
 
-- gather market information and news content using [yfinance](https://github.com/ranaroussi/yfinance).
+- gather market information, financial information and news content using [yfinance](https://github.com/ranaroussi/yfinance).
 - local AI model to analyse news and generate summary.
 - search by company name or symbol and select a security to load its prices, market figures, and news.
+- indicators based on real-time data.
 
 ## Stack
 
@@ -14,6 +15,8 @@ A self-written app for financial analysis. Frontend designed by AI.
 - backend: python, fastapi, ollama
 - ollama for local model hosting
 - yfinance for scraping.
+- pandas for data processing.
+- pandas-ta for analysing indicators.
 
 ## Run locally
 
