@@ -8,9 +8,9 @@ from typing import SupportsFloat, SupportsIndex, cast
 
 import pandas as pd
 import yfinance as yf
+from finance_analysis.route.schemas import StockSnapshot
 
 from ..schemas import PricePoint
-from finance_analysis.route.schemas import StockSnapshot
 
 CACHE_SECONDS = 300
 METRICS = (

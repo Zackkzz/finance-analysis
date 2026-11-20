@@ -1,5 +1,10 @@
-from pydantic import BaseModel, RootModel
-from finance_analysis.service.schemas import NewsContent, PricePoint, GetIncomeStmtResult
+from finance_analysis.service.schemas import (
+    GetIncomeStmtResult,
+    NewsContent,
+    PricePoint,
+)
+from pydantic import BaseModel
+
 
 class StockNewsResponse(BaseModel):
     symbol: str
@@ -13,6 +18,7 @@ class AnalyzedNewsContent(NewsContent):
 class NewsAnalysisResponse(BaseModel):
     articles: list[AnalyzedNewsContent]
     summary: str | None = None
+    summaryArticleCount: int = 0
 
 
 class StockSnapshot(BaseModel):
@@ -23,4 +29,3 @@ class StockSnapshot(BaseModel):
 
 class IncomeStmtSnapShot(GetIncomeStmtResult):
     """Income statement snapshot keyed by report date."""
-    pass

@@ -53,10 +53,15 @@ export function StockNews({ symbol }: { symbol: string }) {
           <aside className="rounded-panel bg-ticker p-6 compact:order-first handset:p-[17px]" aria-labelledby="ai-summary-heading">
             <h3 id="ai-summary-heading" className="font-heading text-[1.25rem] font-bold">AI summary</h3>
             <p className="mt-3 whitespace-pre-line text-sm leading-relaxed wrap-anywhere">
-              {analyzing ? 'Waiting for model analysis…' : data.summary?.trim() || 'An AI summary is not available for these articles.'}
+              {analyzing ? 'Reading articles and preparing summary…'
+                : data.summary?.trim() || (data.summaryArticleCount === 0
+                  ? 'Original article text could not be retrieved.'
+                  : 'An AI summary is not available for these articles.')}
             </p>
             <p className="mt-4 border-t border-rule pt-3 text-label leading-relaxed text-muted">
-              AI-generated interpretation. Read the original reporting for context.
+              {data.summary && data.summaryArticleCount !== null
+                ? `Based on original article text from ${data.summaryArticleCount} of ${articles.length} articles.`
+                : 'Read the original reporting for context.'}
             </p>
           </aside>
           <ol className="col-start-1 row-start-1 divide-y divide-rule rounded-panel border border-rule bg-paper px-6 compact:col-auto compact:row-auto handset:px-[17px]">

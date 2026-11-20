@@ -1,10 +1,9 @@
-import pydantic
-from finance_analysis.service.schemas import GetIncomeStmtResult
 from unittest.mock import Mock
 
 from fastapi.testclient import TestClient
+from finance_analysis.route import api as routes
+from finance_analysis.service.schemas import GetIncomeStmtResult
 
-from finance_analysis.route import main as routes
 
 class TestGet:
     def test_search_returns_matching_quotes(self, monkeypatch):

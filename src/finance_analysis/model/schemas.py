@@ -10,5 +10,5 @@ class AnalysisItem(BaseModel):
 
 class ModelResponse(BaseModel):
     symbol: str
-    analyses: list[AnalysisItem]
     summary: str | None
+    analyses: list[AnalysisItem]

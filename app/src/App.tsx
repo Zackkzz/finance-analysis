@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent } from 'react'
+import { useCallback, useEffect, useState, type MouseEvent } from 'react'
 import { STOCK_SYMBOL } from './features/stocks/api'
 import { StockSearch } from './features/stocks/components/StockSearch'
 import { StockFinancials } from './features/stocks/financials/StockFinancials'
@@ -13,8 +13,9 @@ const defaultSelection: StockMatch = {
 }
 const views = ['Overview', 'Financials'] as const
 type View = typeof views[number]
+type TickerLocation = { selection: StockMatch; view: View }
 
-function readLocation() {
+function readLocation(): TickerLocation {
   const params = new URLSearchParams(window.location.search)
   const symbol = params.get('symbol')?.trim().toUpperCase() || STOCK_SYMBOL
   const saved: StockMatch | undefined = window.history.state?.selection
@@ -32,13 +33,26 @@ function tickerUrl(symbol: string, view: View) {
 }
 
 export default function App() {
-  const [{ selection, view }, setLocation] = useState(readLocation)
+  const [{ selection, view, openedViews }, setLocation] = useState(() => {
+    const location = readLocation()
+    return { ...location, openedViews: [location.view] }
+  })
+
+  const showLocation = useCallback((location: TickerLocation) => {
+    setLocation((previous) => {
+      const openedViews = location.selection.symbol === previous.selection.symbol ? previous.openedViews : []
+      return {
+        ...location,
+        openedViews: openedViews.includes(location.view) ? openedViews : [...openedViews, location.view],
+      }
+    })
+  }, [])
 
   useEffect(() => {
-    function restoreLocation() { setLocation(readLocation()) }
+    function restoreLocation() { showLocation(readLocation()) }
     window.addEventListener('popstate', restoreLocation)
     return () => window.removeEventListener('popstate', restoreLocation)
-  }, [])
+  }, [showLocation])
 
   useEffect(() => {
     const identity = selection.name === selection.symbol ? selection.symbol : `${selection.name} (${selection.symbol})`
@@ -52,7 +66,7 @@ export default function App() {
     } else {
       window.history.pushState({ selection: next }, '', url)
     }
-    setLocation({ selection: next, view: nextView })
+    showLocation({ selection: next, view: nextView })
   }
 
   function followTab(event: MouseEvent<HTMLAnchorElement>, tab: View) {
@@ -85,9 +99,16 @@ export default function App() {
           ))}
         </nav>
       </div>
-      {view === 'Overview'
-        ? <StockOverview key={selection.symbol} selection={selection} />
-        : <StockFinancials key={selection.symbol} selection={selection} />}
+      {openedViews.includes('Overview') && (
+        <div hidden={view !== 'Overview'}>
+          <StockOverview key={selection.symbol} selection={selection} />
+        </div>
+      )}
+      {openedViews.includes('Financials') && (
+        <div hidden={view !== 'Financials'}>
+          <StockFinancials key={selection.symbol} selection={selection} />
+        </div>
+      )}
     </>
   )
 }

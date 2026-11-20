@@ -1,31 +1,18 @@
-STOCK_NEWS_TOOL: dict[str, object] = {
+READ_ARTICLES_TOOL_NAME = "read_articles"
+READ_ARTICLES_TOOL: dict[str, object] = {
     "type": "function",
     "function": {
-        "name": "raw_extract",
+        "name": READ_ARTICLES_TOOL_NAME,
         "description": (
-            "Fetch recent stock-related news from Yahoo Finance. Returns article "
-            "titles, summaries, publication times, providers, and source links. "
-            "May return fewer articles than requested if items fail validation."
+            "Retrieve the original article text for the supplied article IDs. "
+            "Call once with every ID from the current request."
         ),
         "parameters": {
             "type": "object",
             "properties": {
-                "symbol": {
-                    "type": "string",
-                    "description": (
-                        "Yahoo Finance ticker symbol, including the exchange "
-                        "suffix where applicable, such as WTC.AX or AAPL."
-                    ),
-                },
-                "count": {
-                    "type": "integer",
-                    "description": (
-                        "Positive number of news articles to request. "
-                        "Defaults to 10 when omitted."
-                    ),
-                },
+                "article_ids": {"type": "array", "items": {"type": "string"}},
             },
-            "required": ["symbol"],
+            "required": ["article_ids"],
         },
     },
 }

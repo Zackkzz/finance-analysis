@@ -1,17 +1,15 @@
 import logging
 
 import uvicorn
-from pydantic import ValidationError, Field
 from fastapi import FastAPI, HTTPException, Response
-from typing import Annotated
-
-from finance_analysis.model.no_tools import require_news_analysis
 from finance_analysis.model.schemas import ModelResponse
+from finance_analysis.model.workflows import require_news_analysis
+from finance_analysis.service.financials import fetch_income_stmt
 from finance_analysis.service.news import NewsContent, get_news
+from finance_analysis.service.schemas import GetIncomeStmtResult
 from finance_analysis.service.search import search
 from finance_analysis.service.stocks.service import get_stock
-from finance_analysis.service.financials import fetch_income_stmt
-
+from pydantic import ValidationError
 
 from .schemas import (
     AnalyzedNewsContent,
@@ -19,7 +17,6 @@ from .schemas import (
     StockNewsResponse,
     StockSnapshot,
 )
-from finance_analysis.service.schemas import GetIncomeStmtResult
 
 PORT = 8000
 logger = logging.getLogger(__name__)
@@ -32,13 +29,17 @@ app = FastAPI()
 async def get_news_analysis(
     symbol: str, news_content: list[NewsContent]
 ) -> NewsAnalysisResponse:
-    model_response = await require_news_analysis(symbol, news_content)
-    if not model_response:
+    if not news_content:
+        return NewsAnalysisResponse(articles=[])
+
+    result = await require_news_analysis(symbol, news_content)
+    if result is None:
         logger.error("The analysis service returned no response for %s", symbol)
         raise HTTPException(
             status_code=502,
             detail="The analysis service returned no response.",
         )
+    model_response, article_count = result
     try:
         response = ModelResponse.model_validate_json(model_response)
     except ValidationError as err:
@@ -60,8 +61,11 @@ async def get_news_analysis(
         for article in news_content
     ]
 
-    return NewsAnalysisResponse(articles=articles, summary=response.summary)
-
+    return NewsAnalysisResponse(
+        articles=articles,
+        summary=response.summary if article_count else None,
+        summaryArticleCount=article_count,
+    )
 
 # ------------------------------ Post Requests above ------------------------------ #
 
@@ -118,7 +122,6 @@ async def read_news(symbol: str, count: int = 10):
         articles=articles,
     )
 
-
 @app.get("/api/income_stmt")
 async def get_income_stmt(symbol: str, freq: str = 'yearly') -> GetIncomeStmtResult:
     try:
@@ -139,7 +142,7 @@ def main() -> None:
 
 def dev() -> None:
     uvicorn.run(
-        "finance_analysis.route.main:app",
+        "finance_analysis.route.api:app",
         host="127.0.0.1",
         port=8000,
         reload=True,

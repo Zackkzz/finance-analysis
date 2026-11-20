@@ -39,8 +39,13 @@ export async function fetchNews(symbol: string, signal: AbortSignal): Promise<St
     throw new Error('Unexpected news response')
   }
 
-  // Keep all provider fields: the analysis endpoint expects the full news content.
-  return { symbol, articles: data.articles.map((article) => ({ ...article, analysis: null })), summary: null }
+  // Keep the provider fields the analysis endpoint uses to locate each article.
+  return {
+    symbol,
+    articles: data.articles.map((article) => ({ ...article, analysis: null })),
+    summary: null,
+    summaryArticleCount: null,
+  }
 }
 
 export async function fetchNewsAnalysis(
@@ -70,5 +75,6 @@ export async function fetchNewsAnalysis(
     symbol,
     articles: articles.map((article) => ({ ...article, analysis: analysisById.get(article.id) ?? null })),
     summary: data.summary,
+    summaryArticleCount: typeof data.summaryArticleCount === 'number' ? data.summaryArticleCount : null,
   }
 }

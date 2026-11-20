@@ -13,4 +13,5 @@ export type StockNewsResponse = {
   symbol: string
   articles: NewsArticle[]
   summary: string | null
+  summaryArticleCount: number | null
 }

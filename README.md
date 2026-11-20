@@ -28,7 +28,7 @@ uv run finance-analysis
 To serve live stock data and news together, run the route app.
 
 ```sh
-uv run uvicorn finance_analysis.route.main:app --reload
+uv run uvicorn finance_analysis.route.api:app --reload
 ```
 
 In a second terminal, start the frontend.

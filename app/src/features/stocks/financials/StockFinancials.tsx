@@ -12,6 +12,7 @@ const headlineMetrics = new Set(['Total Revenue', 'Gross Profit', 'Operating Inc
 const number = new Intl.NumberFormat('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const retryStyle = 'min-h-11 cursor-pointer rounded-sm border border-rule bg-paper px-4 text-sm font-bold hover:bg-ticker'
 const sectionLabels = { yearly: 'Annual', quarterly: 'Quarterly' } as const
+const frequencies = ['yearly', 'quarterly'] as const
 
 type StatementState =
   | { status: 'loading' }
@@ -19,7 +20,20 @@ type StatementState =
   | { status: 'ready'; periods: Period[] }
 
 export function StockFinancials({ selection }: { selection: StockMatch }) {
-  const [frequency, setFrequency] = useState<Frequency>('yearly')
+  const [{ frequency, openedPeriods }, setPeriod] = useState<{
+    frequency: Frequency
+    openedPeriods: Frequency[]
+  }>({ frequency: 'yearly', openedPeriods: ['yearly'] })
+
+  function selectPeriod(option: Frequency) {
+    setPeriod((previous) => ({
+      frequency: option,
+      openedPeriods: previous.openedPeriods.includes(option)
+        ? previous.openedPeriods
+        : [...previous.openedPeriods, option],
+    }))
+  }
+
   return (
     <main className="page-width pb-8">
       <div className="pt-[43px] pb-[30px] handset:pt-[26px] handset:pb-[22px]">
@@ -38,16 +52,20 @@ export function StockFinancials({ selection }: { selection: StockMatch }) {
             <p className="mt-1 text-label text-muted">Reporting currency is unavailable.</p>
           </div>
           <div role="group" aria-label="Reporting period" className="flex gap-[3px] rounded-md bg-canvas p-[3px]">
-            {(['yearly', 'quarterly'] as const).map((option) => (
+            {frequencies.map((option) => (
               <button key={option} type="button" aria-pressed={frequency === option}
                 className="min-h-11 cursor-pointer rounded-sm px-4 text-label font-bold hover:bg-ticker aria-pressed:bg-navy aria-pressed:text-on-navy"
-                onClick={() => setFrequency(option)}>
+                onClick={() => selectPeriod(option)}>
                 {sectionLabels[option]}
               </button>
             ))}
           </div>
         </div>
-        <StatementBody key={frequency} symbol={selection.symbol} frequency={frequency} />
+        {openedPeriods.map((period) => (
+          <div key={period} hidden={frequency !== period}>
+            <StatementBody symbol={selection.symbol} frequency={period} />
+          </div>
+        ))}
       </section>
       <footer className="pt-4 text-label text-muted">
         Source{' '}
