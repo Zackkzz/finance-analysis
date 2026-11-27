@@ -17,4 +17,3 @@ def macd(symbol: str):
     # Calculate the 9-period EMA of MACD (Signal Line)
     data['Signal_Line'] = data['MACD'].ewm(span=9, adjust=False).mean()
 
-def 
