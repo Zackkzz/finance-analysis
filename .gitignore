@@ -46,3 +46,6 @@ logs/
 
 # dev files
 *.ipynb
+
+#db
+/src/backend/db/*.db
