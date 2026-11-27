@@ -31,7 +31,7 @@ uv run finance-analysis
 To serve live stock data and news together, run the route app.
 
 ```sh
-uv run uvicorn finance_analysis.route.api:app --reload
+uv run uvicorn backend.route.api:app --reload
 ```
 
 In a second terminal, start the frontend.
@@ -48,11 +48,11 @@ Open the [interactive API documentation](http://127.0.0.1:8000/docs) while the b
 
 ## Project layout
 
-- `src/finance_analysis/stock_api.py` defines the FastAPI application and server entry point.
-- `src/finance_analysis/stocks/models.py` defines stock response types.
-- `src/finance_analysis/stocks/service.py` retrieves and caches Yahoo Finance stock data.
-- `src/finance_analysis/stocks/news.py` retrieves and validates Yahoo Finance news.
-- `src/finance_analysis/main.py` provides the raw Yahoo Finance exploration script.
+- `src/backend/stock_api.py` defines the FastAPI application and server entry point.
+- `src/backend/stocks/models.py` defines stock response types.
+- `src/backend/stocks/service.py` retrieves and caches Yahoo Finance stock data.
+- `src/backend/stocks/news.py` retrieves and validates Yahoo Finance news.
+- `src/backend/main.py` provides the raw Yahoo Finance exploration script.
 - `app/src/features/stocks/` contains the stock overview, data hook, chart, types, and formatters.
 - `docs/impeccable/` contains the product and design documentation.
 
