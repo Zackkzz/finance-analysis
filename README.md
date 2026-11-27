@@ -20,13 +20,19 @@ A self-written app for financial analysis. Frontend designed by AI.
 
 ## Run locally
 
+Create database
+
+```sh
+cd src/backend/db
+sqlite3 finance_analysis.db < init.sql
+```
+
 Start the FastAPI stock API from the repository root.
 
 ```sh
 uv sync
-uv run finance-analysis
+uv run backend
 ```
-
 
 To serve live stock data and news together, run the route app.
 
@@ -40,6 +46,13 @@ In a second terminal, start the frontend.
 cd app
 npm ci
 npm run dev
+```
+
+Or run frontend and backend at once.
+
+```sh
+cd scripts
+./startup.sh
 ```
 
 Open the local URL printed by Vite. The Python API listens on port 8000, and Vite proxies `/api` to it. The API caches successful responses for five minutes. An internet connection is required for Yahoo Finance data.

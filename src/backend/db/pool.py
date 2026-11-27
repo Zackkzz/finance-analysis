@@ -5,6 +5,19 @@ from pathlib import Path
 
 DB_NAME="finance_analysis.db"
 
+CREATE_HISTORY_QUERY="""
+    CREATE TABLE IF NOT EXISTS history (
+        date_time DATETIME not NULL,
+        open_price FLOAT,
+        high_price FLOAT,
+        low_price FLOAT,
+        close_price FLOAT,
+        volume INT,
+        dividends FLOAT,
+        stock_splits FLOAT
+    );
+"""
+
 INSERT_QUERY="""
     INSERT INTO history
         (date_time, open_price, high_price, low_price, close_price, volume, dividends, stock_splits)
@@ -25,6 +38,10 @@ def connection() -> Generator[sqlite3.Connection]:
             yield con
     finally:
         con.close()
+
+def create_table():
+    with connection() as con:
+        con.execute(CREATE_HISTORY_QUERY)
 
 def insert_history(params):
     with connection() as con:
