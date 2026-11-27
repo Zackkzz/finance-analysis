@@ -1,7 +1,7 @@
-import pydantic
 import yfinance as yf
+
 from backend.db.pool import insert_history
-from backend.db.schemas import history_list
+
 
 def add_history(symbol: str):
     ticker = yf.Ticker(ticker=symbol)

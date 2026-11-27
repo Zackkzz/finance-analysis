@@ -1,5 +1,7 @@
-from pydantic import BaseModel, RootModel
 from datetime import datetime
+
+from pydantic import BaseModel, RootModel
+
 
 class history(BaseModel):
     open_price: float

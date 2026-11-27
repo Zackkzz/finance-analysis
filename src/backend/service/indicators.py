@@ -1,6 +1,5 @@
-import pandas as pd
 import yfinance as yf
-import pandas_ta_classic as ta
+
 
 def macd(symbol: str):
     ticker = yf.Ticker(ticker=symbol)

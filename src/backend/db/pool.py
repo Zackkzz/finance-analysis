@@ -1,9 +1,8 @@
-from contextlib import contextmanager
-from collections.abc import Generator
-from pathlib import Path
 import sqlite3
+from collections.abc import Generator
+from contextlib import contextmanager
+from pathlib import Path
 
-from pydantic import ValidationError
 DB_NAME="finance_analysis.db"
 
 INSERT_QUERY="""
@@ -13,14 +12,10 @@ INSERT_QUERY="""
         (:date_time, :open_price, :high_price, :low_price, :close_price, :volume, :dividends, :stock_splits);
 """
 
+DELETE_HISTORY_QUERY="""DELETE FROM history;"""
+
 backend_dir = Path(__file__).resolve().parents[1]
 db_path = backend_dir / "db" / DB_NAME
-
-
-
-
-
-DELETE_HISTORY_QUERY="""DELETE FROM history;"""
 
 @contextmanager
 def connection() -> Generator[sqlite3.Connection]:
